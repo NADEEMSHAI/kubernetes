@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: mynginix
+spec:
+  containers:
+    - name: mynginix
+      image: nginx
+      ports:
+        - containerPort: 8080
+

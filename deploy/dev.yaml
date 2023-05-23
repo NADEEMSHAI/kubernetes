@@ -1,0 +1,46 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: nginx-dev
+spec:
+  minReadySeconds: 5
+  replicas: 5
+  selector: 
+    matchLabels: 
+      app: nginx
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 20%
+      maxUnavailable: 20%  
+  template:
+    metadata:
+      name: nginx
+      labels: 
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+          ports:
+            - name: nginxport
+              containerPort: 80
+              protocol: TCP
+---
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-dev-nginx
+  labels:
+    type: service
+spec:
+  selector:
+    app: nginx
+  ports:
+    - name: nginx
+      port: 75
+      protocol: TCP
+      targetPort: 80
+  type: LoadBalancer    

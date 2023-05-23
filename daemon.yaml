@@ -1,0 +1,23 @@
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: busybox
+  labels:
+    app: busybox
+spec:
+  minReadySeconds: 10
+  selector:
+    matchlabel: 
+  template:
+    metadata:
+      name: busybox
+      lables:
+        app: busybox
+    spec:
+      contianers:
+        - name: busybox
+          image: busybox
+          args:
+            - sleep
+            - 10s

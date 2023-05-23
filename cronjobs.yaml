@@ -1,0 +1,31 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: alpine-cjob
+  labels:
+    name: alpine-cjob
+spec:
+  schedule: '*/30 * * * *'
+  jobTemplate:
+    metadata:
+      name: myalpine-job
+      labels:
+        name: myalpine-job
+    spec:
+      backoffLimit: 3
+      template:
+         metadata:
+           name: myalpine-pod
+           labels:
+             name: myalpine-pod
+         spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: alpine
+              image: alpine
+              args:
+                - sleep
+                - 20s
+              
+      

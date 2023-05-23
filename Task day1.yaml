@@ -1,0 +1,76 @@
+### Exercises
+# Write a shell script
+# Note: all the scripts will be run as a root user
+
+@@@ 1.To install jenkins with java 11
+------
+#!/bin/bash
+sudo apt update
+sudo apt install openjdk-11-jdk -y
+java -version                                         
+curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \     
+  /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
+sudo apt-get update
+sudo apt-get install jenkins -y
+------
+
+@@@ 2.To install jenkins with java 17
+------
+#!/bin/bash
+sudo apt update
+sudo apt install openjdk-17-jdk -y
+java -version
+curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
+  /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
+sudo apt-get update
+sudo apt-get install jenkins -y
+------
+
+@@@ 3.To install kubernetes (using kubeadm) skip init
+-------
+#!/bin/bash
+sudo apt update
+curl -fsSL https://get.docker.com -o get-docker.sh    #docker installation
+sh get-docker.sh
+# Run these commands as root
+###Install GO### kubernetes installation process
+!/bin/bash
+wget https://storage.googleapis.com/golang/getgo/installer_linux
+chmod +x ./installer_linux
+./installer_linux
+source ~/.bash_profile
+git clone https://github.com/Mirantis/cri-dockerd.git
+cd cri-dockerd
+mkdir bin
+go build -o bin/cri-dockerd
+mkdir -p /usr/local/bin
+install -o root -g root -m 0755 bin/cri-dockerd /usr/local/bin/cri-dockerd
+cp -a packaging/systemd/* /etc/systemd/system
+sed -i -e 's,/usr/bin/cri-dockerd,/usr/local/bin/cri-dockerd,' /etc/systemd/system/cri-docker.service
+systemctl daemon-reload
+systemctl enable cri-docker.service
+systemctl enable --now cri-docker.socket
+sudo apt-get update
+sudo apt-get install -y apt-transport-https ca-certificates curl
+sudo curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get update
+sudo apt-get install -y kubelet kubeadm kubectl
+sudo apt-mark hold kubelet kubeadm kubectl
+## AFTER this kubeadm init should be run in only master
+kubeadm init --pod-network-cidr "10.244.0.0/16"
+kubeadm init --pod-network-cidr "10.244.0.0/16" --cri-socket "unix:///var/run/cri-dockerd.sock"
+## above steps done as root user after this change to normal user
+## apply the three command shown their mkdir.. after that download flannel
+
+kubeadm join 172.31.6.119:6443 --token tm77n0.48d74nbcpvwqqjqg \--cri-socket "unix:///var/run/cri-dockerd.sock"\ 
+--discovery-token-ca-cert-hash sha256:6a7527f5fe7d79fa722bde1b495f7155b9bde001345bba198f45a650868885f1
+
+
+

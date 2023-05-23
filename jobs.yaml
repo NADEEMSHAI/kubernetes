@@ -1,0 +1,22 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mynginx
+  labels:
+    name: mynginx
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      name: mynginx
+      labels:
+        name: mynginx
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: nginx
+          image: alpine
+          args:
+            - sleep
+            - 10s
